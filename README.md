@@ -8,7 +8,8 @@ Generative Adversarial Networks (GANs) are a class of deep learning models that 
 
 In this repository, you will find the implementation of DCGAN and various advanced GAN architectures, along with experimental results for complex image generation tasks.
 
-https://www.mdpi.com/applsci/applsci-12-06569/article_deploy/html/images/applsci-12-06569-g001.png
+![image](https://github.com/dagbeme1/holbertonschool-gan/assets/105249635/005b4a6d-8a79-40da-93b6-47f97ef4f4d5)
+
 
 **DCGAN**
 

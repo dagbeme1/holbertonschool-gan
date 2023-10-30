@@ -25,6 +25,7 @@ NumPy
 Matplotlib (for visualization)
 You can install the required Python packages using pip:
 **pip install tensorflow numpy matplotlib**
+
 **References**
 Original DCGAN paper by Radford et al.: Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks
 

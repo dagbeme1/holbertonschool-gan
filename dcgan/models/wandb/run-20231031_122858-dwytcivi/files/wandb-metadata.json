@@ -1,0 +1,80 @@
+{
+    "os": "Linux-5.15.90.1-microsoft-standard-WSL2-x86_64-with-glibc2.29",
+    "python": "3.8.10",
+    "heartbeatAt": "2023-10-31T17:28:58.821810",
+    "startedAt": "2023-10-31T17:28:58.067056",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "precision_changes.py",
+    "codePathLocal": "precision_changes.py",
+    "codePath": "dcgan/models/precision_changes.py",
+    "git": {
+        "remote": "https://github.com/dagbeme1/holbertonschool-gan.git",
+        "commit": "41fb5ad0e3596890bf62c77c002a44e9ef1c27e5"
+    },
+    "email": "you@example.com",
+    "root": "/home/dagbemenu/holbertonschool-gan",
+    "host": "DESKTOP-1AG9O62",
+    "username": "dagbemenu",
+    "executable": "/home/dagbemenu/holbertonschool-gan/dcgan/models/my_tensorflow_env/bin/python",
+    "cpu_count": 4,
+    "cpu_count_logical": 8,
+    "cpu_freq": {
+        "current": 1896.0050000000006,
+        "min": 0.0,
+        "max": 0.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 1896.005,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 1896.005,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 1896.005,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 1896.005,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 1896.005,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 1896.005,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 1896.005,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 1896.005,
+            "min": 0.0,
+            "max": 0.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 1006.853931427002,
+            "used": 21.061534881591797
+        }
+    },
+    "memory": {
+        "total": 15.531185150146484
+    }
+}

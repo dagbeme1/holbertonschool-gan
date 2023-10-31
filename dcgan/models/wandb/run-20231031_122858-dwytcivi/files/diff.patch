@@ -1,0 +1,41 @@
+diff --git a/dcgan/experiments/README.md b/dcgan/experiments/README.md
+deleted file mode 100644
+index 6c9cb2c..0000000
+--- a/dcgan/experiments/README.md
++++ /dev/null
+@@ -1 +0,0 @@
+-This is the readme for this experiments
+diff --git a/dcgan/models/wandb/debug-internal.log b/dcgan/models/wandb/debug-internal.log
+index 7f5e292..24ad84f 120000
+--- a/dcgan/models/wandb/debug-internal.log
++++ b/dcgan/models/wandb/debug-internal.log
+@@ -1 +1 @@
+-run-20231031_080130-2frzvoqo/logs/debug-internal.log
+\ No newline at end of file
++run-20231031_122858-dwytcivi/logs/debug-internal.log
+\ No newline at end of file
+diff --git a/dcgan/models/wandb/debug.log b/dcgan/models/wandb/debug.log
+index 4120dfc..1a5bf1b 120000
+--- a/dcgan/models/wandb/debug.log
++++ b/dcgan/models/wandb/debug.log
+@@ -1 +1 @@
+-run-20231031_080130-2frzvoqo/logs/debug.log
+\ No newline at end of file
++run-20231031_122858-dwytcivi/logs/debug.log
+\ No newline at end of file
+diff --git a/dcgan/models/wandb/latest-run b/dcgan/models/wandb/latest-run
+index d5b4d81..46d12c0 120000
+--- a/dcgan/models/wandb/latest-run
++++ b/dcgan/models/wandb/latest-run
+@@ -1 +1 @@
+-run-20231031_080130-2frzvoqo
+\ No newline at end of file
++run-20231031_122858-dwytcivi
+\ No newline at end of file
+diff --git a/dcgan/utils/README.md b/dcgan/utils/README.md
+deleted file mode 100644
+index 13ccb23..0000000
+--- a/dcgan/utils/README.md
++++ /dev/null
+@@ -1 +0,0 @@
+-This is a readme for this directory

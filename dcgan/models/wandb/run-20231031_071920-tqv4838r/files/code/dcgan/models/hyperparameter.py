@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import wandb
 import os
 import time
-from tqdm import tqdm  # Import tqdm for the progress bar
+from tqdm import tqdm  # Import tqdm for progress bar
 
 # Define the generator model
 def make_generator_model():
@@ -22,7 +22,7 @@ def make_generator_model():
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
 
-    model.add(layers.Reshape((7, 7, 256)))
+    model.add(layers.Reshape((7, 7, 256)))  # Corrected formatting
 
     model.add(layers.Conv2DTranspose(128, (5, 5), strides=(1, 1), padding='same', use_bias=False))
     model.add(layers.BatchNormalization())
@@ -33,7 +33,7 @@ def make_generator_model():
     model.add(layers.LeakyReLU())
 
     model.add(layers.Conv2DTranspose(1, (5, 5), strides=(2, 2), padding='same', use_bias=False, activation='tanh'))
-
+    
     return model
 
 # Define the discriminator model
@@ -58,7 +58,7 @@ def make_discriminator_model():
 
     return model
 
-# Define the loss functions for the generator and discriminator
+# Define the loss functions for generator and discriminator
 cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 
 def discriminator_loss(real_output, fake_output):
@@ -89,7 +89,7 @@ def generator_loss(fake_output):
     """
     return cross_entropy(tf.ones_like(fake_output), fake_output)
 
-# Define the optimizers for the generator and discriminator
+# Define the optimizers for generator and discriminator
 generator_optimizer = tf.keras.optimizers.Adam(1e-4)
 discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
 
@@ -164,9 +164,9 @@ def train(dataset, epochs, generator, discriminator):
     for epoch in range(epochs):
         for image_batch in tqdm(dataset, desc=f"Epoch {epoch+1}/{epochs}"):
             train_step(image_batch, generator)
-        # Generate and save images after every epoch
-        noise = tf.random.normal([16, 100])
-        generate_and_save_images(generator, epoch + 1, noise)
+        if (epoch + 1) % 10 == 0:
+            noise = tf.random.normal([16, 100])
+            generate_and_save_images(generator, epoch + 1, noise)
 
 # Initialize Weights and Biases for experiment tracking
 wandb.init(project="dcgan_mnist")

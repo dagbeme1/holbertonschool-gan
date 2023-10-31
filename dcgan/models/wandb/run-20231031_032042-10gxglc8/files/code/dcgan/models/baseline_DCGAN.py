@@ -5,17 +5,15 @@ from tensorflow.keras import layers
 import numpy as np
 import matplotlib.pyplot as plt
 import wandb
-import os
-import time
-from tqdm import tqdm  # Import tqdm for the progress bar
 
 # Define the generator model
 def make_generator_model():
     """
-    Creates and returns a generator model for DCGAN.
+    Create the generator model for DCGAN.
 
     Returns:
-    tf.keras.Sequential: The generator model.
+        model: tf.keras.Sequential
+            The generator model.
     """
     model = tf.keras.Sequential()
     model.add(layers.Dense(7 * 7 * 256, use_bias=False, input_shape=(100,)))
@@ -39,10 +37,11 @@ def make_generator_model():
 # Define the discriminator model
 def make_discriminator_model():
     """
-    Creates and returns a discriminator model for DCGAN.
+    Create the discriminator model for DCGAN.
 
     Returns:
-    tf.keras.Sequential: The discriminator model.
+        model: tf.keras.Sequential
+            The discriminator model.
     """
     model = tf.keras.Sequential()
     model.add(layers.Conv2D(64, (5, 5), strides=(2, 2), padding='same', input_shape=[28, 28, 1]))
@@ -58,19 +57,22 @@ def make_discriminator_model():
 
     return model
 
-# Define the loss functions for the generator and discriminator
+# Define the loss functions for generator and discriminator
 cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 
 def discriminator_loss(real_output, fake_output):
     """
-    Calculates the discriminator's loss.
+    Calculate the discriminator's loss.
 
     Args:
-    real_output (tf.Tensor): Output from the real data.
-    fake_output (tf.Tensor): Output from the generated data.
+        real_output: tf.Tensor
+            Output of the discriminator for real images.
+        fake_output: tf.Tensor
+            Output of the discriminator for fake images.
 
     Returns:
-    tf.Tensor: The total discriminator loss.
+        total_loss: tf.Tensor
+            Total discriminator loss.
     """
     real_loss = cross_entropy(tf.ones_like(real_output), real_output)
     fake_loss = cross_entropy(tf.zeros_like(fake_output), fake_output)
@@ -79,32 +81,33 @@ def discriminator_loss(real_output, fake_output):
 
 def generator_loss(fake_output):
     """
-    Calculates the generator's loss.
+    Calculate the generator's loss.
 
     Args:
-    fake_output (tf.Tensor): Output from the generated data.
+        fake_output: tf.Tensor
+            Output of the discriminator for fake images.
 
     Returns:
-    tf.Tensor: The generator loss.
+        gen_loss: tf.Tensor
+            Generator loss.
     """
     return cross_entropy(tf.ones_like(fake_output), fake_output)
 
-# Define the optimizers for the generator and discriminator
+# Define the optimizers for generator and discriminator
 generator_optimizer = tf.keras.optimizers.Adam(1e-4)
 discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
 
-# Define the training loop
+# Define the while loop for training
 @tf.function
 def train_step(images, generator):
     """
-    Executes a single training step for the GAN.
+    Perform a training step for the GAN.
 
     Args:
-    images (tf.Tensor): Batch of real images.
-    generator (tf.keras.Model): Generator model.
-
-    Returns:
-    None
+        images: tf.Tensor
+            Batch of real images.
+        generator: tf.keras.Sequential
+            The generator model.
     """
     noise = tf.random.normal([config.batch_size, 100])
 
@@ -126,16 +129,17 @@ def train_step(images, generator):
 # Define a function to generate and save images
 def generate_and_save_images(model, epoch, test_input):
     """
-    Generates images using the generator model and saves them.
+    Generate and save images using the generator model.
 
     Args:
-    model (tf.keras.Model): Generator model.
-    epoch (int): Current epoch.
-    test_input (tf.Tensor): Input noise for generating images.
-
-    Returns:
-    None
+        model: tf.keras.Sequential
+            The generator model.
+        epoch: int
+            The current epoch.
+        test_input: tf.Tensor
+            Input noise for generating images.
     """
+    # Generate images and save them
     predictions = model(test_input, training=False)
     fig = plt.figure(figsize=(4, 4))
 
@@ -150,36 +154,37 @@ def generate_and_save_images(model, epoch, test_input):
 # Main training loop
 def train(dataset, epochs, generator, discriminator):
     """
-    Main training loop for the GAN.
+    Train the GAN model.
 
     Args:
-    dataset (tf.data.Dataset): Training dataset.
-    epochs (int): Number of training epochs.
-    generator (tf.keras.Model): Generator model.
-    discriminator (tf.keras.Model): Discriminator model.
-
-    Returns:
-    None
+        dataset: tf.data.Dataset
+            The training dataset.
+        epochs: int
+            Number of training epochs.
+        generator: tf.keras.Sequential
+            The generator model.
+        discriminator: tf.keras.Sequential
+            The discriminator model.
     """
     for epoch in range(epochs):
-        for image_batch in tqdm(dataset, desc=f"Epoch {epoch+1}/{epochs}"):
+        for image_batch in dataset:
             train_step(image_batch, generator)
-        # Generate and save images after every epoch
-        noise = tf.random.normal([16, 100])
-        generate_and_save_images(generator, epoch + 1, noise)
+        if (epoch + 1) % 10 == 0:
+            noise = tf.random.normal([16, 100])
+            generate_and_save_images(generator, epoch + 1, noise)
 
 # Initialize Weights and Biases for experiment tracking
 wandb.init(project="dcgan_mnist")
 config = wandb.config
-config.epochs = 5
-config.batch_size = 10000
+config.epochs = 1000
+config.batch_size = 128
 
 # Load the MNIST dataset
 (train_images, train_labels), (_, _) = tf.keras.datasets.mnist.load_data()
 train_images = train_images.reshape(train_images.shape[0], 28, 28, 1).astype('float32')
 train_images = (train_images - 127.5) / 127.5
 
-BUFFER_SIZE = 10000
+BUFFER_SIZE = 60000
 train_dataset = tf.data.Dataset.from_tensor_slices(train_images).shuffle(BUFFER_SIZE).batch(config.batch_size)
 
 # Create and compile the generator and discriminator models

@@ -5,15 +5,15 @@ from tensorflow.keras import layers
 import numpy as np
 import matplotlib.pyplot as plt
 import wandb
+from tqdm import tqdm  # Import tqdm for progress bar
 
 # Define the generator model
 def make_generator_model():
     """
-    Create the generator model for DCGAN.
+    Creates and returns a generator model for DCGAN.
 
     Returns:
-        model: tf.keras.Sequential
-            The generator model.
+    tf.keras.Sequential: The generator model.
     """
     model = tf.keras.Sequential()
     model.add(layers.Dense(7 * 7 * 256, use_bias=False, input_shape=(100,)))
@@ -37,11 +37,10 @@ def make_generator_model():
 # Define the discriminator model
 def make_discriminator_model():
     """
-    Create the discriminator model for DCGAN.
+    Creates and returns a discriminator model for DCGAN.
 
     Returns:
-        model: tf.keras.Sequential
-            The discriminator model.
+    tf.keras.Sequential: The discriminator model.
     """
     model = tf.keras.Sequential()
     model.add(layers.Conv2D(64, (5, 5), strides=(2, 2), padding='same', input_shape=[28, 28, 1]))
@@ -62,17 +61,14 @@ cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 
 def discriminator_loss(real_output, fake_output):
     """
-    Calculate the discriminator's loss.
+    Calculates the discriminator's loss.
 
     Args:
-        real_output: tf.Tensor
-            Output of the discriminator for real images.
-        fake_output: tf.Tensor
-            Output of the discriminator for fake images.
+    real_output (tf.Tensor): Output from the real data.
+    fake_output (tf.Tensor): Output from the generated data.
 
     Returns:
-        total_loss: tf.Tensor
-            Total discriminator loss.
+    tf.Tensor: The total discriminator loss.
     """
     real_loss = cross_entropy(tf.ones_like(real_output), real_output)
     fake_loss = cross_entropy(tf.zeros_like(fake_output), fake_output)
@@ -81,15 +77,13 @@ def discriminator_loss(real_output, fake_output):
 
 def generator_loss(fake_output):
     """
-    Calculate the generator's loss.
+    Calculates the generator's loss.
 
     Args:
-        fake_output: tf.Tensor
-            Output of the discriminator for fake images.
+    fake_output (tf.Tensor): Output from the generated data.
 
     Returns:
-        gen_loss: tf.Tensor
-            Generator loss.
+    tf.Tensor: The generator loss.
     """
     return cross_entropy(tf.ones_like(fake_output), fake_output)
 
@@ -97,17 +91,18 @@ def generator_loss(fake_output):
 generator_optimizer = tf.keras.optimizers.Adam(1e-4)
 discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
 
-# Define the while loop for training
+# Define the training loop
 @tf.function
 def train_step(images, generator):
     """
-    Perform a training step for the GAN.
+    Executes a single training step for the GAN.
 
     Args:
-        images: tf.Tensor
-            Batch of real images.
-        generator: tf.keras.Sequential
-            The generator model.
+    images (tf.Tensor): Batch of real images.
+    generator (tf.keras.Model): Generator model.
+
+    Returns:
+    None
     """
     noise = tf.random.normal([config.batch_size, 100])
 
@@ -129,17 +124,16 @@ def train_step(images, generator):
 # Define a function to generate and save images
 def generate_and_save_images(model, epoch, test_input):
     """
-    Generate and save images using the generator model.
+    Generates images using the generator model and saves them.
 
     Args:
-        model: tf.keras.Sequential
-            The generator model.
-        epoch: int
-            The current epoch.
-        test_input: tf.Tensor
-            Input noise for generating images.
+    model (tf.keras.Model): Generator model.
+    epoch (int): Current epoch.
+    test_input (tf.Tensor): Input noise for generating images.
+
+    Returns:
+    None
     """
-    # Generate images and save them
     predictions = model(test_input, training=False)
     fig = plt.figure(figsize=(4, 4))
 
@@ -154,20 +148,19 @@ def generate_and_save_images(model, epoch, test_input):
 # Main training loop
 def train(dataset, epochs, generator, discriminator):
     """
-    Train the GAN model.
+    Main training loop for the GAN.
 
     Args:
-        dataset: tf.data.Dataset
-            The training dataset.
-        epochs: int
-            Number of training epochs.
-        generator: tf.keras.Sequential
-            The generator model.
-        discriminator: tf.keras.Sequential
-            The discriminator model.
+    dataset (tf.data.Dataset): Training dataset.
+    epochs (int): Number of training epochs.
+    generator (tf.keras.Model): Generator model.
+    discriminator (tf.keras.Model): Discriminator model.
+
+    Returns:
+    None
     """
     for epoch in range(epochs):
-        for image_batch in dataset:
+        for image_batch in tqdm(dataset, desc=f"Epoch {epoch+1}/{epochs}"):
             train_step(image_batch, generator)
         if (epoch + 1) % 10 == 0:
             noise = tf.random.normal([16, 100])
@@ -193,3 +186,4 @@ discriminator = make_discriminator_model()
 
 # Train the GAN
 train(train_dataset, config.epochs, generator, discriminator)
+

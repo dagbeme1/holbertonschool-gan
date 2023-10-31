@@ -5,7 +5,9 @@ from tensorflow.keras import layers
 import numpy as np
 import matplotlib.pyplot as plt
 import wandb
-from tqdm import tqdm  # Import tqdm for progress bar
+import os
+import time
+from tqdm import tqdm  # Import tqdm for the progress bar
 
 # Define the generator model
 def make_generator_model():
@@ -20,8 +22,8 @@ def make_generator_model():
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
 
-    model.add(layers.Reshape((7, 7, 256))
-    
+    model.add(layers.Reshape((7, 7, 256)))
+
     model.add(layers.Conv2DTranspose(128, (5, 5), strides=(1, 1), padding='same', use_bias=False))
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
@@ -31,7 +33,7 @@ def make_generator_model():
     model.add(layers.LeakyReLU())
 
     model.add(layers.Conv2DTranspose(1, (5, 5), strides=(2, 2), padding='same', use_bias=False, activation='tanh'))
-    
+
     return model
 
 # Define the discriminator model
@@ -56,7 +58,7 @@ def make_discriminator_model():
 
     return model
 
-# Define the loss functions for generator and discriminator
+# Define the loss functions for the generator and discriminator
 cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 
 def discriminator_loss(real_output, fake_output):
@@ -87,6 +89,10 @@ def generator_loss(fake_output):
     """
     return cross_entropy(tf.ones_like(fake_output), fake_output)
 
+# Define the optimizers for the generator and discriminator
+generator_optimizer = tf.keras.optimizers.Adam(1e-4)
+discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
+
 # Define the training loop
 @tf.function
 def train_step(images, generator):
@@ -111,7 +117,7 @@ def train_step(images, generator):
         gen_loss = generator_loss(fake_output)
         disc_loss = discriminator_loss(real_output, fake_output)
 
-    gradients of generator = gen_tape.gradient(gen_loss, generator.trainable_variables)
+    gradients_of_generator = gen_tape.gradient(gen_loss, generator.trainable_variables)
     gradients_of_discriminator = disc_tape.gradient(disc_loss, discriminator.trainable_variables)
 
     generator_optimizer.apply_gradients(zip(gradients_of_generator, generator.trainable_variables))
@@ -158,38 +164,27 @@ def train(dataset, epochs, generator, discriminator):
     for epoch in range(epochs):
         for image_batch in tqdm(dataset, desc=f"Epoch {epoch+1}/{epochs}"):
             train_step(image_batch, generator)
-        if (epoch + 1) % 10 == 0:
-            noise = tf.random.normal([16, 100])
-            generate_and_save_images(generator, epoch + 1, noise)
+        # Generate and save images after every epoch
+        noise = tf.random.normal([16, 100])
+        generate_and_save_images(generator, epoch + 1, noise)
 
 # Initialize Weights and Biases for experiment tracking
 wandb.init(project="dcgan_mnist")
 config = wandb.config
-
-# Experiment with different hyperparameters
-config.learning_rate = 1e-4  # Adjust learning rate
-config.batch_size = 128  # Adjust batch size
-config.optimizer = 'adam'  # Try different optimizers
-config.num_epochs = 100  # Adjust the number of training epochs
+config.epochs = 5
+config.batch_size = 10000
 
 # Load the MNIST dataset
 (train_images, train_labels), (_, _) = tf.keras.datasets.mnist.load_data()
 train_images = train_images.reshape(train_images.shape[0], 28, 28, 1).astype('float32')
 train_images = (train_images - 127.5) / 127.5
 
-BUFFER_SIZE = 60000
+BUFFER_SIZE = 10000
 train_dataset = tf.data.Dataset.from_tensor_slices(train_images).shuffle(BUFFER_SIZE).batch(config.batch_size)
 
 # Create and compile the generator and discriminator models
 generator = make_generator_model()
 discriminator = make_discriminator_model()
 
-# Configure optimizers based on the selected option
-if config.optimizer == 'adam':
-    generator_optimizer = tf.keras.optimizers.Adam(config.learning_rate)
-    discriminator_optimizer = tf.keras.optimizers.Adam(config.learning_rate)
-# You can add more optimizer options here if needed
-
 # Train the GAN
-train(train_dataset, config.num_epochs, generator, discriminator)
-
+train(train_dataset, config.epochs, generator, discriminator)

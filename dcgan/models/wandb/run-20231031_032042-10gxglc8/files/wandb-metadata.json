@@ -1,0 +1,80 @@
+{
+    "os": "Linux-5.15.90.1-microsoft-standard-WSL2-x86_64-with-glibc2.29",
+    "python": "3.8.10",
+    "heartbeatAt": "2023-10-31T08:20:42.846704",
+    "startedAt": "2023-10-31T08:20:42.040215",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "baseline_DCGAN.py",
+    "codePathLocal": "baseline_DCGAN.py",
+    "codePath": "dcgan/models/baseline_DCGAN.py",
+    "git": {
+        "remote": "https://github.com/dagbeme1/holbertonschool-gan.git",
+        "commit": "b046e67b910345d604ec2f3e25375bbab348bda5"
+    },
+    "email": "you@example.com",
+    "root": "/home/dagbemenu/holbertonschool-gan",
+    "host": "DESKTOP-1AG9O62",
+    "username": "dagbemenu",
+    "executable": "/home/dagbemenu/holbertonschool-gan/dcgan/models/my_tensorflow_env/bin/python3",
+    "cpu_count": 4,
+    "cpu_count_logical": 8,
+    "cpu_freq": {
+        "current": 1896.0050000000006,
+        "min": 0.0,
+        "max": 0.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 1896.005,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 1896.005,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 1896.005,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 1896.005,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 1896.005,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 1896.005,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 1896.005,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 1896.005,
+            "min": 0.0,
+            "max": 0.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 1006.853931427002,
+            "used": 21.057559967041016
+        }
+    },
+    "memory": {
+        "total": 15.531185150146484
+    }
+}

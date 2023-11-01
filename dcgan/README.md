@@ -1,4 +1,4 @@
-Baseline DCGAN
+Baseline DCGAN(Deep Convolutional GAN)
 
 **Weight and Biases(Link)**
 
@@ -11,6 +11,7 @@ Baseline DCGAN
 Hyperparameter Tuning
 
 **Weight and Biases(Link)**
+
     **https://wandb.ai/dennisagbedivi1/dcgan_mnist/reports/Hyperparameter-Tuning--Vmlldzo1ODUyNjkw**
 
 **Notes**

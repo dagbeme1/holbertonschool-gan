@@ -1,0 +1,192 @@
+diff --git a/dcgan/models/baseline_DCGAN.py b/dcgan/models/baseline_DCGAN.py
+old mode 100755
+new mode 100644
+index ef30977..f44b088
+--- a/dcgan/models/baseline_DCGAN.py
++++ b/dcgan/models/baseline_DCGAN.py
+@@ -4,44 +4,35 @@ import tensorflow as tf
+ from tensorflow.keras import layers
+ import numpy as np
+ import matplotlib.pyplot as plt
+-import wandb
+-from tqdm import tqdm  # Import tqdm for progress bar
++import wandb  # Import the wandb library
+ 
+ # Define the generator model
+ def make_generator_model():
+-    """
+-    Creates and returns a generator model for DCGAN.
+-
+-    Returns:
+-    tf.keras.Sequential: The generator model.
+-    """
+     model = tf.keras.Sequential()
+     model.add(layers.Dense(7 * 7 * 256, use_bias=False, input_shape=(100,)))
+     model.add(layers.BatchNormalization())
+     model.add(layers.LeakyReLU())
+ 
+     model.add(layers.Reshape((7, 7, 256)))
++    #assert model.output_shape == (None, 7, 7, 256))
+ 
+     model.add(layers.Conv2DTranspose(128, (5, 5), strides=(1, 1), padding='same', use_bias=False))
++    assert model.output_shape == (None, 7, 7, 128)
+     model.add(layers.BatchNormalization())
+     model.add(layers.LeakyReLU())
+ 
+     model.add(layers.Conv2DTranspose(64, (5, 5), strides=(2, 2), padding='same', use_bias=False))
++    assert model.output_shape == (None, 14, 14, 64)
+     model.add(layers.BatchNormalization())
+     model.add(layers.LeakyReLU())
+ 
+     model.add(layers.Conv2DTranspose(1, (5, 5), strides=(2, 2), padding='same', use_bias=False, activation='tanh'))
++    assert model.output_shape == (None, 28, 28, 1)
+ 
+     return model
+ 
+ # Define the discriminator model
+ def make_discriminator_model():
+-    """
+-    Creates and returns a discriminator model for DCGAN.
+-
+-    Returns:
+-    tf.keras.Sequential: The discriminator model.
+-    """
+     model = tf.keras.Sequential()
+     model.add(layers.Conv2D(64, (5, 5), strides=(2, 2), padding='same', input_shape=[28, 28, 1]))
+     model.add(layers.LeakyReLU())
+@@ -60,50 +51,21 @@ def make_discriminator_model():
+ cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
+ 
+ def discriminator_loss(real_output, fake_output):
+-    """
+-    Calculates the discriminator's loss.
+-
+-    Args:
+-    real_output (tf.Tensor): Output from the real data.
+-    fake_output (tf.Tensor): Output from the generated data.
+-
+-    Returns:
+-    tf.Tensor: The total discriminator loss.
+-    """
+     real_loss = cross_entropy(tf.ones_like(real_output), real_output)
+     fake_loss = cross_entropy(tf.zeros_like(fake_output), fake_output)
+     total_loss = real_loss + fake_loss
+     return total_loss
+ 
+ def generator_loss(fake_output):
+-    """
+-    Calculates the generator's loss.
+-
+-    Args:
+-    fake_output (tf.Tensor): Output from the generated data.
+-
+-    Returns:
+-    tf.Tensor: The generator loss.
+-    """
+     return cross_entropy(tf.ones_like(fake_output), fake_output)
+ 
+ # Define the optimizers for generator and discriminator
+ generator_optimizer = tf.keras.optimizers.Adam(1e-4)
+ discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
+ 
+-# Define the training loop
++# Define the while loop for training
+ @tf.function
+ def train_step(images, generator):
+-    """
+-    Executes a single training step for the GAN.
+-
+-    Args:
+-    images (tf.Tensor): Batch of real images.
+-    generator (tf.keras.Model): Generator model.
+-
+-    Returns:
+-    None
+-    """
+     noise = tf.random.normal([config.batch_size, 100])
+ 
+     with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
+@@ -123,17 +85,7 @@ def train_step(images, generator):
+ 
+ # Define a function to generate and save images
+ def generate_and_save_images(model, epoch, test_input):
+-    """
+-    Generates images using the generator model and saves them.
+-
+-    Args:
+-    model (tf.keras.Model): Generator model.
+-    epoch (int): Current epoch.
+-    test_input (tf.Tensor): Input noise for generating images.
+-
+-    Returns:
+-    None
+-    """
++    # Generate images and save them
+     predictions = model(test_input, training=False)
+     fig = plt.figure(figsize=(4, 4))
+ 
+@@ -147,20 +99,8 @@ def generate_and_save_images(model, epoch, test_input):
+ 
+ # Main training loop
+ def train(dataset, epochs, generator, discriminator):
+-    """
+-    Main training loop for the GAN.
+-
+-    Args:
+-    dataset (tf.data.Dataset): Training dataset.
+-    epochs (int): Number of training epochs.
+-    generator (tf.keras.Model): Generator model.
+-    discriminator (tf.keras.Model): Discriminator model.
+-
+-    Returns:
+-    None
+-    """
+     for epoch in range(epochs):
+-        for image_batch in tqdm(dataset, desc=f"Epoch {epoch+1}/{epochs}"):
++        for image_batch in dataset:
+             train_step(image_batch, generator)
+         if (epoch + 1) % 10 == 0:
+             noise = tf.random.normal([16, 100])
+@@ -169,8 +109,8 @@ def train(dataset, epochs, generator, discriminator):
+ # Initialize Weights and Biases for experiment tracking
+ wandb.init(project="dcgan_mnist")
+ config = wandb.config
+-config.epochs = 1000
+-config.batch_size = 128
++config.epochs = 80
++config.batch_size = 356
+ 
+ # Load the MNIST dataset
+ (train_images, train_labels), (_, _) = tf.keras.datasets.mnist.load_data()
+@@ -186,4 +126,3 @@ discriminator = make_discriminator_model()
+ 
+ # Train the GAN
+ train(train_dataset, config.epochs, generator, discriminator)
+-
+diff --git a/dcgan/models/wandb/debug-internal.log b/dcgan/models/wandb/debug-internal.log
+index 24ad84f..ce99747 120000
+--- a/dcgan/models/wandb/debug-internal.log
++++ b/dcgan/models/wandb/debug-internal.log
+@@ -1 +1 @@
+-run-20231031_122858-dwytcivi/logs/debug-internal.log
+\ No newline at end of file
++run-20231031_185457-r8k29k1n/logs/debug-internal.log
+\ No newline at end of file
+diff --git a/dcgan/models/wandb/debug.log b/dcgan/models/wandb/debug.log
+index 1a5bf1b..cf198f6 120000
+--- a/dcgan/models/wandb/debug.log
++++ b/dcgan/models/wandb/debug.log
+@@ -1 +1 @@
+-run-20231031_122858-dwytcivi/logs/debug.log
+\ No newline at end of file
++run-20231031_185457-r8k29k1n/logs/debug.log
+\ No newline at end of file
+diff --git a/dcgan/models/wandb/latest-run b/dcgan/models/wandb/latest-run
+index 46d12c0..2cc27fb 120000
+--- a/dcgan/models/wandb/latest-run
++++ b/dcgan/models/wandb/latest-run
+@@ -1 +1 @@
+-run-20231031_122858-dwytcivi
+\ No newline at end of file
++run-20231031_185457-r8k29k1n
+\ No newline at end of file

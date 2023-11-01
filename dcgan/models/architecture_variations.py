@@ -4,25 +4,22 @@ import tensorflow as tf
 from tensorflow.keras import layers
 import numpy as np
 import matplotlib.pyplot as plt
-import wandb
-import os
-from tqdm import tqdm  # Import tqdm for progress bar
+import wandb  # Import the wandb library for experiment tracking
+from wandb.keras import WandbCallback
 
-# Define the generator model
 def make_generator_model():
     """
-    Creates and returns a generator model for DCGAN.
+    Create a generator model for a DCGAN.
 
     Returns:
-    tf.keras.Sequential: The generator model.
+        A tf.keras.Sequential model representing the generator.
     """
     model = tf.keras.Sequential()
     model.add(layers.Dense(7 * 7 * 256, use_bias=False, input_shape=(100,)))
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
 
-    model.add(layers.Reshape((7, 7, 256)))
-
+    model.add(layers.Reshape((7, 7, 256))
     model.add(layers.Conv2DTranspose(128, (5, 5), strides=(1, 1), padding='same', use_bias=False))
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
@@ -35,13 +32,12 @@ def make_generator_model():
 
     return model
 
-# Define the discriminator model
 def make_discriminator_model():
     """
-    Creates and returns a discriminator model for DCGAN.
+    Create a discriminator model for a DCGAN.
 
     Returns:
-    tf.keras.Sequential: The discriminator model.
+        A tf.keras.Sequential model representing the discriminator.
     """
     model = tf.keras.Sequential()
     model.add(layers.Conv2D(64, (5, 5), strides=(2, 2), padding='same', input_shape=[28, 28, 1]))
@@ -57,34 +53,31 @@ def make_discriminator_model():
 
     return model
 
-# Define the loss functions for generator and discriminator
-cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
-
 def discriminator_loss(real_output, fake_output):
     """
-    Calculates the discriminator's loss.
+    Calculate the discriminator loss.
 
     Args:
-    real_output (tf.Tensor): Output from the real data.
-    fake_output (tf.Tensor): Output from the generated data.
+        real_output: Real output values from the discriminator.
+        fake_output: Fake output values from the discriminator.
 
     Returns:
-    tf.Tensor: The total discriminator loss.
+        Total loss for the discriminator.
     """
     real_loss = cross_entropy(tf.ones_like(real_output), real_output)
     fake_loss = cross_entropy(tf.zeros_like(fake_output), fake_output)
-    total_loss = real_loss + fake_loss
+    total loss = real_loss + fake_loss
     return total_loss
 
 def generator_loss(fake_output):
     """
-    Calculates the generator's loss.
+    Calculate the generator loss.
 
     Args:
-    fake_output (tf.Tensor): Output from the generated data.
+        fake_output: Fake output values from the discriminator.
 
     Returns:
-    tf.Tensor: The generator loss.
+        Loss for the generator.
     """
     return cross_entropy(tf.ones_like(fake_output), fake_output)
 
@@ -92,18 +85,18 @@ def generator_loss(fake_output):
 generator_optimizer = tf.keras.optimizers.Adam(1e-4)
 discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
 
-# Define the training loop
+# Define the training step
 @tf.function
 def train_step(images, generator):
     """
-    Executes a single training step for the GAN.
+    Perform a single training step.
 
     Args:
-    images (tf.Tensor): Batch of real images.
-    generator (tf.keras.Model): Generator model.
+        images: Input images from the dataset.
+        generator: The generator model.
 
     Returns:
-    None
+        None
     """
     noise = tf.random.normal([config.batch_size, 100])
 
@@ -122,18 +115,18 @@ def train_step(images, generator):
     generator_optimizer.apply_gradients(zip(gradients_of_generator, generator.trainable_variables))
     discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, discriminator.trainable_variables))
 
-# Define a function to generate and save images
-def generate_and_save_images(model, epoch, test_input):
+def generate_and_save_images(model, epoch, test_input, variant):
     """
-    Generates images using the generator model and saves them.
+    Generate images using the generator and save them.
 
     Args:
-    model (tf.keras.Model): Generator model.
-    epoch (int): Current epoch.
-    test_input (tf.Tensor): Input noise for generating images.
+        model: The generator model.
+        epoch: The current training epoch.
+        test_input: Input noise for generating images.
+        variant: The variant of the model being used.
 
     Returns:
-    None
+        None
     """
     predictions = model(test_input, training=False)
     fig = plt.figure(figsize=(4, 4))
@@ -143,48 +136,67 @@ def generate_and_save_images(model, epoch, test_input):
         plt.imshow(predictions[i, :, :, 0] * 127.5 + 127.5, cmap='gray')
         plt.axis('off')
 
-    plt.savefig('image_at_epoch_{:04d}.png'.format(epoch))
+    plt.savefig(f'image_at_epoch_{epoch:04d}_variant_{variant}.png')
     plt.show()
 
-# Main training loop
-def train(dataset, epochs, generator, discriminator):
+def train(dataset, epochs, generator, discriminator, save_interval, variant):
     """
-    Main training loop for the GAN.
+    Main training loop for the DCGAN.
 
     Args:
-    dataset (tf.data.Dataset): Training dataset.
-    epochs (int): Number of training epochs.
-    generator (tf.keras.Model): Generator model.
-    discriminator (tf.keras.Model): Discriminator model.
+        dataset: The training dataset.
+        epochs: The number of training epochs.
+        generator: The generator model.
+        discriminator: The discriminator model.
+        save_interval: Interval for saving generated images.
+        variant: The variant of the model being used.
 
     Returns:
-    None
+        None
     """
     for epoch in range(epochs):
-        for image_batch in tqdm(dataset, desc=f"Epoch {epoch+1}/{epochs}"):
+        for image_batch in dataset:
             train_step(image_batch, generator)
-        # Generate and save images after every epoch
-        noise = tf.random.normal([16, 100])
-        generate_and_save_images(generator, epoch + 1, noise)
+        if (epoch + 1) % save_interval == 0:
+            noise = tf.random.normal([16, 100])
+            generate_and_save_images(generator, epoch + 1, noise, variant)
+
+# Set the interval at which you want to save images (e.g., every 10 epochs)
+save_interval = 10
 
 # Initialize Weights and Biases for experiment tracking
 wandb.init(project="dcgan_mnist")
 config = wandb.config
-config.epochs = 5
-config.batch_size = 10000
+config.epochs = 80
+config.batch_size = 256
 
 # Load the MNIST dataset
 (train_images, train_labels), (_, _) = tf.keras.datasets.mnist.load_data()
 train_images = train_images.reshape(train_images.shape[0], 28, 28, 1).astype('float32')
 train_images = (train_images - 127.5) / 127.5
 
-BUFFER_SIZE = 10000
+BUFFER_SIZE = 60000
 train_dataset = tf.data.Dataset.from_tensor_slices(train_images).shuffle(BUFFER_SIZE).batch(config.batch_size)
 
-# Create and compile the generator and discriminator models
-generator = make_generator_model()
-discriminator = make_discriminator_model()
+# Define variations of DCGAN architectures
+generator_variant_1 = make_generator_model()
+discriminator_variant_1 = make_discriminator_model()
+# Modify architecture for variant 1
 
-# Train the GAN
-train(train_dataset, config.epochs, generator, discriminator)
+generator_variant_2 = make_generator_model()
+discriminator_variant_2 = make_discriminator_model()
+# Modify architecture for variant 2
+
+# Define additional variants with different architectures
+
+# Experiment loop
+for variant, (generator, discriminator) in enumerate([(generator_variant_1, discriminator_variant_1), (generator_variant_2, discriminator_variant_2)]):
+    # Initialize Weights and Biases for experiment tracking
+    wandb.init(project=f"dcgan_mnist_variant_{variant}")
+
+    # Train the DCGAN with the modified architecture
+    train(train_dataset, config.epochs, generator, discriminator, save_interval, variant)
+
+    # Compare and evaluate the results with the baseline
+    # You can compare generated images, losses, and other relevant metrics
 

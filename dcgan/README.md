@@ -1,4 +1,4 @@
-Baseline DCGAN
+Baseline DCGAN(Deep Convolutional GAN)
 
 **Weight and Biases(Link)**
 

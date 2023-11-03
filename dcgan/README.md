@@ -2,7 +2,7 @@ Baseline DCGAN(Deep Convolutional GAN)
 
 **Weight and Biases(Link)**
 
-    **https://wandb.ai/dennisagbedivi1/dcgan_mnist/reports/Baseline-DCGAN--Vmlldzo1ODUyNTY0**
+    **https://wandb.ai/dennisagbedivi1/dcgan_mnist/reports/Baseline-DCGAN--Vmlldzo1ODUyNTY0(https://wandb.ai/dennisagbedivi1/dcgan_mnist/reports/baseline-DCGAN--Vmlldzo1ODU5NDg4)**
 
 **Notes**
 
@@ -12,7 +12,7 @@ Hyperparameter Tuning
 
 **Weight and Biases(Link)**
 
-    **https://wandb.ai/dennisagbedivi1/dcgan_mnist/reports/Hyperparameter-Tuning--Vmlldzo1ODUyNjkw**
+    **https://wandb.ai/dennisagbedivi1/dcgan_mnist/reports/Hyperparameter-Tuning--Vmlldzo1ODUyNjkw(https://wandb.ai/dennisagbedivi1/dcgan_mnist/reports/Hyperparameter-Tuning--Vmlldzo1ODU5NTE4)**
 
 **Notes**
 
@@ -22,7 +22,7 @@ Architecture Variations
 
 **Weight and Biases(Link)**
 
-    **https://wandb.ai/dennisagbedivi1/dcgan_mnist/reports/Architecture-Variations--Vmlldzo1ODUyNzU3**
+    **https://wandb.ai/dennisagbedivi1/dcgan_mnist/reports/Architecture-Variations--Vmlldzo1ODUyNzU3(https://wandb.ai/dennisagbedivi1/dcgan_mnist/reports/-Architecture-Variations--Vmlldzo1ODU5NTAz)**
 
 **Notes**
 
@@ -32,7 +32,7 @@ Precision Changes
 
 **Weight and Biases(Link)**
 
-    **https://wandb.ai/dennisagbedivi1/dcgan_mnist/reports/Precision-Changes--Vmlldzo1ODUyODM2**
+    **https://wandb.ai/dennisagbedivi1/dcgan_mnist/reports/Precision-Changes--Vmlldzo1ODUyODM2(https://wandb.ai/dennisagbedivi1/dcgan_mnist/reports/Precision-Changes--Vmlldzo1ODU5NTI0)**
 
 **Notes**
 
